@@ -1,4 +1,4 @@
-# distributed_application
+# distributed_application_hive
 
 A new Flutter project.
 

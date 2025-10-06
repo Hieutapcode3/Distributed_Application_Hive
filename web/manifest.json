@@ -1,6 +1,6 @@
 {
-    "name": "distributed_application",
-    "short_name": "distributed_application",
+    "name": "distributed_application_hive",
+    "short_name": "distributed_application_hive",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

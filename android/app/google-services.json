@@ -1,0 +1,76 @@
+{
+  "project_info": {
+    "project_number": "672928219309",
+    "project_id": "chathive-f6b33",
+    "storage_bucket": "chathive-f6b33.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:672928219309:android:9e4a6a90219050807b8624",
+        "android_client_info": {
+          "package_name": "com.example.distributed_application_hive"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "672928219309-lte6ger08g3ln0kht4keb2coghgkher5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBliSPqmSAiB5hk1H8tMlppLVhDUS7eVGE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "672928219309-lte6ger08g3ln0kht4keb2coghgkher5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:672928219309:android:ae31fc14f3a490ea7b8624",
+        "android_client_info": {
+          "package_name": "edu.phenikaa.distributedchat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "672928219309-cfnmnk39du2blee7e8jhdknbfm3c92ar.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.phenikaa.distributedchat",
+            "certificate_hash": "436ebffe8629a27c0e2fc4f5dbc2a56cbff29b4c"
+          }
+        },
+        {
+          "client_id": "672928219309-lte6ger08g3ln0kht4keb2coghgkher5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBliSPqmSAiB5hk1H8tMlppLVhDUS7eVGE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "672928219309-lte6ger08g3ln0kht4keb2coghgkher5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
