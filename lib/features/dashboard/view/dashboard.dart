@@ -28,6 +28,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     });
   }
 
+  Future<void> _signOut() async {
+    final auth = ref.read(authServiceProvider);
+    await auth.signOut();
+
+    // Quay về màn hình login
+    if (mounted) {
+      Navigator.pop(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,11 +53,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         centerTitle: true,
         actions: [
           GestureDetector(
-            onTap: () {
-              final auth = ref.read(authServiceProvider);
-              auth.signOut();
-            },
-            child: Icon(Icons.logout),
+            onTap: _signOut,
+            child: const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Icon(Icons.logout),
+            ),
           ),
         ],
       ),
