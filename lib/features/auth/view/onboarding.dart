@@ -9,6 +9,7 @@ class OnboardingScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -60,7 +61,7 @@ class OnboardingScreen extends ConsumerWidget {
                 SignInButton(
                   Buttons.google,
                   onPressed: () {
-                    // Handle Google sign-in
+                    
                   },
                 ),
                 SignInButton(
