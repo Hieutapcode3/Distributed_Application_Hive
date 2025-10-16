@@ -1,13 +1,11 @@
 import 'package:distributed_application_hive/features/auth/data/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive/hive.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final Box<UserModel> _userBox = Hive.box<UserModel>('userBox');
-
-  final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email', 'profile'], signInOption: SignInOption.standard);
+  final Box<UserModel> _currentUserBox = Hive.box<UserModel>('currentUserBox');
 
   // ---------------- Email / Password ----------------
   Future<User?> registerWithEmail({required String name, required String email, required String password}) async {
@@ -18,7 +16,8 @@ class AuthService {
 
       final userModel = UserModel(uid: user!.uid, name: name, email: email);
 
-      await _userBox.put('user', userModel);
+      await _userBox.put(userModel.uid, userModel);
+      await _currentUserBox.put(userModel.uid, userModel);
       return user;
     } on FirebaseAuthException catch (e) {
       throw Exception(e.message);
@@ -26,67 +25,44 @@ class AuthService {
   }
 
   Future<User?> signInWithEmail({required String email, required String password}) async {
-    try {
-      UserCredential result = await _auth.signInWithEmailAndPassword(email: email, password: password);
-      User? user = result.user;
+  try {
+    UserCredential result = await _auth.signInWithEmailAndPassword(email: email, password: password);
+    User? user = result.user;
 
-      final userModel = UserModel(uid: user!.uid, name: user.displayName ?? '', email: email);
+    final userModel = UserModel(uid: user!.uid, name: user.displayName ?? '', email: email);
 
-      final existingUser = _userBox.get('user');
-      if (existingUser == null || existingUser.uid != userModel.uid) {
-        await _userBox.put('user', userModel);
-      }
-
-      return user;
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
-        // Xóa Hive cho an toàn
-        await _userBox.clear();
-      }
-      throw Exception(e.message);
+    final existingUser = _userBox.get(userModel.uid);
+    if (existingUser == null || existingUser.uid != userModel.uid) {
+      await _userBox.put(userModel.uid, userModel); 
+      await _currentUserBox.put(userModel.uid, userModel);
     }
+
+    return user;
+  } on FirebaseAuthException catch (e) {
+    if (e.code == 'user-not-found') {
+      await _userBox.clear();
+    }
+    throw Exception(e.message);
   }
-
-  // ---------------- Google Sign-In ----------------
-  // Future<User?> signInWithGoogle() async {
-  //   try {
-  //     final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-  //     if (googleUser == null) return null;
-
-  //     final GoogleSignInAuthentication googleAuth =
-  //         await googleUser.authentication;
-
-  //     final credential = GoogleAuthProvider.credential(
-  //       accessToken: googleAuth.accessToken,
-  //       idToken: googleAuth.idToken,
-  //     );
-
-  //     final userCredential = await _auth.signInWithCredential(credential);
-  //     final user = userCredential.user;
-  //     if (user == null) return null;
-
-  //     final userModel = UserModel(
-  //       uid: user.uid,
-  //       name: user.displayName ?? '',
-  //       email: user.email ?? '',
-  //       profilePictureUrl: user.photoURL,
-  //     );
-
-  //     await _userBox.put('user', userModel);
-  //     return user;
-  //   } catch (e) {
-  //     print('Lỗi Google Sign-In: $e');
-  //     return null;
-  //   }
-  // }
+}
 
   // ---------------- Sign Out ----------------
   Future<void> signOut() async {
     try {
       await _auth.signOut();
-      await _userBox.clear();
     } catch (e) {
       throw Exception('Error signing out: $e');
+    }
+  }
+
+  Future<void> deleteUser() async {
+    try {
+      
+      await _userBox.clear();
+      await _currentUserBox.clear();
+      print("Deleted user data from Hive boxes.");
+    } catch (e) {
+      throw Exception('Error deleting user: $e');
     }
   }
 }

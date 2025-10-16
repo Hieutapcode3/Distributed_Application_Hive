@@ -1,6 +1,6 @@
 import 'package:distributed_application_hive/features/auth/data/auth_service.dart';
 import 'package:distributed_application_hive/features/auth/view/resgister.dart';
-import 'package:distributed_application_hive/features/dashboard/view/dashboard.dart';
+import 'package:distributed_application_hive/features/home/view/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sign_in_button/sign_in_button.dart';
@@ -138,7 +138,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         if (user != null) {
                           Navigator.pushReplacement(
                             context,
-                            MaterialPageRoute(builder: (context) => const DashboardScreen()),
+                            MaterialPageRoute(builder: (context) => const HomeScreen()),
                           );
                         } else {
                           ScaffoldMessenger.of(

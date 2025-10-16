@@ -22,4 +22,18 @@ class UserModel {
     required this.email,
     this.profilePictureUrl,
   });
+
+  factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
+        uid: json['uid'] ?? '',
+        name: json['name'] ?? '',
+        email: json['email'] ?? '',
+        profilePictureUrl: json['profilePictureUrl'],
+      );
+
+  Map<String, dynamic> toJson() => {
+        'uid': uid,
+        'name': name,
+        'email': email,
+        'profilePictureUrl': profilePictureUrl,
+      };
 }

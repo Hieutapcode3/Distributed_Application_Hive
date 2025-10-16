@@ -1,3 +1,4 @@
+import 'package:distributed_application_hive/features/auth/data/auth_service.dart';
 import 'package:distributed_application_hive/features/auth/view/login.dart';
 import 'package:distributed_application_hive/features/auth/view/resgister.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +10,8 @@ class OnboardingScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    
+    final authServiceProvider = Provider<AuthService>((ref) => AuthService());
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -61,7 +63,8 @@ class OnboardingScreen extends ConsumerWidget {
                 SignInButton(
                   Buttons.google,
                   onPressed: () {
-                    
+                    final auth = ref.read(authServiceProvider);
+                    auth.deleteUser();
                   },
                 ),
                 SignInButton(
