@@ -12,7 +12,7 @@ class WebSocketService {
   IOWebSocketChannel? channel;
 
   Future<void> connect(UserModel currentUser) async {
-    if (channel != null) return; 
+    if (channel != null) return;
 
     final userBox = Hive.isBoxOpen('userBox')
         ? Hive.box<UserModel>('userBox')
@@ -22,12 +22,11 @@ class WebSocketService {
         ? Hive.box<MessageModel>('messageBox')
         : await Hive.openBox<MessageModel>('messageBox');
 
-    channel = IOWebSocketChannel.connect('ws://10.0.2.2:8080');
+    channel = IOWebSocketChannel.connect('wss://chat-server-00oc.onrender.com');
 
-    channel!.sink.add(jsonEncode({
-      'type': 'connect',
-      'user': currentUser.toJson(),
-    }));
+    channel!.sink.add(
+      jsonEncode({'type': 'connect', 'user': currentUser.toJson()}),
+    );
 
     channel!.stream.listen((message) {
       final data = jsonDecode(message);
@@ -47,7 +46,9 @@ class WebSocketService {
 
         case 'message':
           messageBox.put(
-              data['message']['id'], MessageModel.fromJson(data['message']));
+            data['message']['id'],
+            MessageModel.fromJson(data['message']),
+          );
           break;
       }
     });
@@ -55,10 +56,9 @@ class WebSocketService {
 
   void sendMessage(MessageModel message) {
     if (channel == null) return;
-    channel!.sink.add(jsonEncode({
-      'type': 'message',
-      'message': message.toJson(),
-    }));
+    channel!.sink.add(
+      jsonEncode({'type': 'message', 'message': message.toJson()}),
+    );
   }
 
   void close() {
