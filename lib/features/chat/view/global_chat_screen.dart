@@ -7,7 +7,9 @@ import 'package:distributed_application_hive/features/auth/data/user_model.dart'
 import 'package:distributed_application_hive/app/web_socket.dart';
 
 // 🔹 Provider cho WebSocketService
-final webSocketProvider = Provider<WebSocketService>((ref) => WebSocketService());
+final webSocketProvider = Provider<WebSocketService>(
+  (ref) => WebSocketService(),
+);
 
 class GlobalChatScreen extends ConsumerStatefulWidget {
   final UserModel currentUser;
@@ -61,7 +63,10 @@ class _GlobalChatScreenState extends ConsumerState<GlobalChatScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: const Text('🌍 Global Chat', style: TextStyle(color: Colors.black)),
+        title: const Text(
+          '🌍 Global Chat',
+          style: TextStyle(color: Colors.black, fontFamily: 'Caros'),
+        ),
         centerTitle: true,
       ),
       body: Column(
@@ -71,26 +76,35 @@ class _GlobalChatScreenState extends ConsumerState<GlobalChatScreen> {
             child: ValueListenableBuilder(
               valueListenable: messageBox.listenable(),
               builder: (context, Box<MessageModel> box, _) {
-                final messages = box.values.where((m) => m.roomId == "global").toList()
-                  ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+                final messages =
+                    box.values.where((m) => m.roomId == "global").toList()
+                      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
                 print("Total messages in global chat: ${messages.length}");
 
                 if (messages.isEmpty) {
                   return const Center(
-                    child: Text('💬 Chưa có tin nhắn nào', style: TextStyle(color: Colors.white70)),
+                    child: Text(
+                      '💬 Chưa có tin nhắn nào',
+                      style: TextStyle(color: Colors.white70),
+                    ),
                   );
                 }
 
                 return ListView.builder(
                   controller: _scrollController,
-                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 10,
+                    horizontal: 12,
+                  ),
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
                     final msg = messages[index];
                     final isMe = msg.senderId == widget.currentUser.uid;
 
                     return Align(
-                      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                      alignment: isMe
+                          ? Alignment.centerRight
+                          : Alignment.centerLeft,
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -98,11 +112,18 @@ class _GlobalChatScreenState extends ConsumerState<GlobalChatScreen> {
                           if (!isMe)
                             Padding(
                               padding: const EdgeInsets.only(right: 8),
-                              child: CircleAvatar(radius: 20, backgroundImage: AssetImage('assets/image/mtp.jpg')),
+                              child: CircleAvatar(
+                                radius: 20,
+                                backgroundImage: AssetImage(
+                                  'assets/image/mtp.jpg',
+                                ),
+                              ),
                             ),
 
                           Column(
-                            crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                            crossAxisAlignment: isMe
+                                ? CrossAxisAlignment.end
+                                : CrossAxisAlignment.start,
                             children: [
                               if (!isMe)
                                 Padding(
@@ -126,14 +147,23 @@ class _GlobalChatScreenState extends ConsumerState<GlobalChatScreen> {
                                       : const Color.fromRGBO(242, 247, 251, 1),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
-                                child: Text(msg.content, style: const TextStyle(color: Colors.black, fontSize: 15)),
+                                child: Text(
+                                  msg.content,
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 15,
+                                  ),
+                                ),
                               ),
 
                               Padding(
                                 padding: const EdgeInsets.only(top: 2),
                                 child: Text(
                                   '${msg.timestamp.hour}:${msg.timestamp.minute.toString().padLeft(2, '0')}',
-                                  style: TextStyle(fontSize: 10, color: Colors.black54),
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: Colors.black54,
+                                  ),
                                 ),
                               ),
                             ],
@@ -161,8 +191,14 @@ class _GlobalChatScreenState extends ConsumerState<GlobalChatScreen> {
                       hintStyle: const TextStyle(color: Colors.white54),
                       filled: true,
                       fillColor: Colors.grey[850],
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
                     ),
                     onSubmitted: (_) => _sendMessage(),
                   ),
