@@ -1,5 +1,5 @@
 import 'package:distributed_application_hive/features/home/view/callscreens.dart';
-import 'package:distributed_application_hive/features/home/view/contactscreens.dart';
+import 'package:distributed_application_hive/features/home/view/contacts_screen.dart';
 import 'package:distributed_application_hive/features/home/view/home.dart';
 import 'package:distributed_application_hive/features/home/view/settingscreens.dart';
 import 'package:flutter/material.dart';
