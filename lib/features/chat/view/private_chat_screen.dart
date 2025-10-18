@@ -6,7 +6,9 @@ import 'package:distributed_application_hive/features/chat/data/message_model.da
 import 'package:distributed_application_hive/features/auth/data/user_model.dart';
 import 'package:distributed_application_hive/app/web_socket.dart';
 
-final webSocketProvider = Provider<WebSocketService>((ref) => WebSocketService());
+final webSocketProvider = Provider<WebSocketService>(
+  (ref) => WebSocketService(),
+);
 
 class PrivateChatScreen extends ConsumerStatefulWidget {
   final UserModel currentUser;
@@ -79,12 +81,17 @@ class _PrivateChatScreenState extends ConsumerState<PrivateChatScreen> {
           children: [
             CircleAvatar(
               radius: 18,
-              backgroundImage: (widget.receiver.profilePictureUrl != null && widget.receiver.profilePictureUrl!.isNotEmpty)
+              backgroundImage:
+                  (widget.receiver.profilePictureUrl != null &&
+                      widget.receiver.profilePictureUrl!.isNotEmpty)
                   ? NetworkImage(widget.receiver.profilePictureUrl!)
                   : const AssetImage('assets/image/mtp.jpg') as ImageProvider,
             ),
             const SizedBox(width: 8),
-            Text(widget.receiver.name, style: const TextStyle(color: Colors.black)),
+            Text(
+              widget.receiver.name,
+              style: const TextStyle(color: Colors.black),
+            ),
           ],
         ),
       ),
@@ -95,27 +102,34 @@ class _PrivateChatScreenState extends ConsumerState<PrivateChatScreen> {
             child: ValueListenableBuilder(
               valueListenable: messageBox.listenable(),
               builder: (context, Box<MessageModel> box, _) {
-                final messages = box.values
-                    .where((m) => m.roomId == roomId)
-                    .toList()
-                  ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+                final messages =
+                    box.values.where((m) => m.roomId == roomId).toList()
+                      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
                 if (messages.isEmpty) {
                   return const Center(
-                    child: Text('💬 Chưa có tin nhắn nào', style: TextStyle(color: Colors.black54)),
+                    child: Text(
+                      '💬 Chưa có tin nhắn nào',
+                      style: TextStyle(color: Colors.black54),
+                    ),
                   );
                 }
 
                 return ListView.builder(
                   controller: _scrollController,
-                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 8,
+                    horizontal: 12,
+                  ),
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
                     final msg = messages[index];
                     final isMe = msg.senderId == widget.currentUser.uid;
 
                     return Align(
-                      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                      alignment: isMe
+                          ? Alignment.centerRight
+                          : Alignment.centerLeft,
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -125,14 +139,24 @@ class _PrivateChatScreenState extends ConsumerState<PrivateChatScreen> {
                               padding: const EdgeInsets.only(right: 8),
                               child: CircleAvatar(
                                 radius: 18,
-                                backgroundImage: (widget.receiver.profilePictureUrl != null &&
-                                        widget.receiver.profilePictureUrl!.isNotEmpty)
-                                    ? NetworkImage(widget.receiver.profilePictureUrl!)
-                                    : const AssetImage('assets/image/mtp.png') as ImageProvider,
+                                backgroundImage:
+                                    (widget.receiver.profilePictureUrl !=
+                                            null &&
+                                        widget
+                                            .receiver
+                                            .profilePictureUrl!
+                                            .isNotEmpty)
+                                    ? NetworkImage(
+                                        widget.receiver.profilePictureUrl!,
+                                      )
+                                    : const AssetImage('assets/image/mtp.jpg')
+                                          as ImageProvider,
                               ),
                             ),
                           Column(
-                            crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                            crossAxisAlignment: isMe
+                                ? CrossAxisAlignment.end
+                                : CrossAxisAlignment.start,
                             children: [
                               if (!isMe)
                                 Padding(
@@ -157,14 +181,20 @@ class _PrivateChatScreenState extends ConsumerState<PrivateChatScreen> {
                                 ),
                                 child: Text(
                                   msg.content,
-                                  style: const TextStyle(color: Colors.black, fontSize: 15),
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 15,
+                                  ),
                                 ),
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(top: 2),
                                 child: Text(
                                   '${msg.timestamp.hour}:${msg.timestamp.minute.toString().padLeft(2, '0')}',
-                                  style: const TextStyle(fontSize: 10, color: Colors.black54),
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    color: Colors.black54,
+                                  ),
                                 ),
                               ),
                             ],
@@ -197,7 +227,10 @@ class _PrivateChatScreenState extends ConsumerState<PrivateChatScreen> {
                         borderRadius: BorderRadius.circular(20),
                         borderSide: BorderSide.none,
                       ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
                     ),
                     onSubmitted: (_) => _sendMessage(),
                   ),
