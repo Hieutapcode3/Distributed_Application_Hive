@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import '../models/call_type.dart';
+import 'avatar_with_online_status.dart';
+import 'package:distributed_application_hive/features/auth/data/user_model.dart';
 
 class CallItem extends StatelessWidget {
   final String name;
   final String time;
   final CallType callType;
   final String avatar;
+  final UserModel? user;
 
   const CallItem({
     super.key,
@@ -13,6 +16,7 @@ class CallItem extends StatelessWidget {
     required this.time,
     required this.callType,
     required this.avatar,
+    this.user,
   });
 
   @override
@@ -36,9 +40,10 @@ class CallItem extends StatelessWidget {
     }
 
     return ListTile(
-      leading: CircleAvatar(
+      leading: AvatarWithOnlineStatus(
+        user: user,
         radius: 25,
-        backgroundImage: const AssetImage('assets/image/mtp.jpg'),
+        showOnlineStatus: true,
       ),
       title: Text(
         name,

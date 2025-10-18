@@ -73,6 +73,20 @@ class ChatHelpers {
     }
   }
 
+  // Helper function để lấy tin nhắn mới nhất của global chat
+  static MessageModel? getLatestGlobalMessage() {
+    final messageBox = Hive.box<MessageModel>('messageBox');
+    final messages = messageBox.values.where((message) {
+      return message.roomId == 'global';
+    }).toList();
+
+    if (messages.isEmpty) return null;
+
+    // Sắp xếp theo thời gian và lấy tin nhắn mới nhất
+    messages.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    return messages.first;
+  }
+
   // Helper function để xử lý notice
   static void handleNotice(BuildContext context, String userName) {
     ScaffoldMessenger.of(context).showSnackBar(

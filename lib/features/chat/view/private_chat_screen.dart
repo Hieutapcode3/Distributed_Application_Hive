@@ -37,6 +37,17 @@ class _PrivateChatScreenState extends ConsumerState<PrivateChatScreen> {
     // 🆕 Tạo roomId cố định cho 2 người (tránh trùng)
     final ids = [widget.currentUser.uid, widget.receiver.uid]..sort();
     roomId = ids.join('_');
+
+    // Auto-scroll xuống dưới cùng khi màn hình được mở
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToBottom();
+    });
+  }
+
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    }
   }
 
   void _sendMessage() {
@@ -59,13 +70,7 @@ class _PrivateChatScreenState extends ConsumerState<PrivateChatScreen> {
 
     // Cuộn xuống tin nhắn mới
     Future.delayed(const Duration(milliseconds: 150), () {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      }
+      _scrollToBottom();
     });
   }
 
@@ -105,6 +110,11 @@ class _PrivateChatScreenState extends ConsumerState<PrivateChatScreen> {
                 final messages =
                     box.values.where((m) => m.roomId == roomId).toList()
                       ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+
+                // Auto-scroll khi có tin nhắn mới
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  _scrollToBottom();
+                });
 
                 if (messages.isEmpty) {
                   return const Center(

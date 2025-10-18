@@ -1,4 +1,4 @@
-import 'package:distributed_application_hive/features/home/view/home.dart';
+import 'package:distributed_application_hive/features/home/view/mainscreens.dart';
 import 'package:flutter/material.dart';
 
 class SettingsAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -25,7 +25,7 @@ class SettingsAppBar extends StatelessWidget implements PreferredSizeWidget {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => HomeScreen()),
+            MaterialPageRoute(builder: (context) => MainScreen()),
           );
         },
       ),

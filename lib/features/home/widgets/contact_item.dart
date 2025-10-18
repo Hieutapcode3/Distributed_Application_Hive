@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
 import '../models/contact.dart';
+import 'avatar_with_online_status.dart';
+import 'package:distributed_application_hive/features/auth/data/user_model.dart';
 
 class ContactItem extends StatelessWidget {
   final Contact contact;
+  final UserModel? user;
 
-  const ContactItem({super.key, required this.contact});
+  const ContactItem({super.key, required this.contact, this.user});
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: CircleAvatar(
+      leading: AvatarWithOnlineStatus(
+        user: user,
         radius: 25,
-        backgroundImage: AssetImage(contact.avatar),
+        showOnlineStatus: true,
       ),
       title: Text(
         contact.name,

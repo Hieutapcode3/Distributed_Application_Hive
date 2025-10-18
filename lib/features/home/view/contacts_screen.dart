@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:distributed_application_hive/features/auth/data/user_model.dart';
 import '../models/contact.dart';
 import '../widgets/contact_item.dart';
 import '../widgets/contacts_app_bar.dart';
@@ -132,109 +134,133 @@ class ContactsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Sắp xếp danh sách theo tên
-    final sortedContacts = List<Contact>.from(_contacts)
-      ..sort((a, b) => a.name.compareTo(b.name));
+    return ValueListenableBuilder(
+      valueListenable: Hive.box<UserModel>('userBox').listenable(),
+      builder: (context, Box<UserModel> box, _) {
+        final users = box.values.toList();
 
-    // Nhóm danh sách theo chữ cái đầu
-    final Map<String, List<Contact>> groupedContacts = {};
-    for (final contact in sortedContacts) {
-      final firstLetter = contact.firstLetter;
-      if (!groupedContacts.containsKey(firstLetter)) {
-        groupedContacts[firstLetter] = [];
-      }
-      groupedContacts[firstLetter]!.add(contact);
-    }
+        // Sắp xếp danh sách theo tên
+        final sortedContacts = List<Contact>.from(_contacts)
+          ..sort((a, b) => a.name.compareTo(b.name));
 
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: const ContactsAppBar(),
-      body: Container(
-        color: Colors.black,
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
+        // Nhóm danh sách theo chữ cái đầu
+        final Map<String, List<Contact>> groupedContacts = {};
+        for (final contact in sortedContacts) {
+          final firstLetter = contact.firstLetter;
+          if (!groupedContacts.containsKey(firstLetter)) {
+            groupedContacts[firstLetter] = [];
+          }
+          groupedContacts[firstLetter]!.add(contact);
+        }
 
-            // Container bo góc trên - nền trắng
-            Expanded(
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(40),
-                    topRight: Radius.circular(40),
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 16,
-                    horizontal: 12,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Tiêu đề "My Contact"
-                      const Padding(
-                        padding: EdgeInsets.only(left: 16, bottom: 16, top: 8),
-                        child: Text(
-                          "My Contact",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Caros',
+        return Scaffold(
+          backgroundColor: Colors.black,
+          appBar: const ContactsAppBar(),
+          body: Container(
+            color: Colors.black,
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+
+                // Container bo góc trên - nền trắng
+                Expanded(
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(40),
+                        topRight: Radius.circular(40),
+                      ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                        horizontal: 12,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Tiêu đề "My Contact"
+                          const Padding(
+                            padding: EdgeInsets.only(
+                              left: 16,
+                              bottom: 16,
+                              top: 8,
+                            ),
+                            child: Text(
+                              "My Contact",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'Caros',
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
 
-                      // Danh sách liên hệ được phân theo bảng chữ cái
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: groupedContacts.length,
-                          itemBuilder: (context, index) {
-                            final sortedKeys = groupedContacts.keys.toList()
-                              ..sort();
-                            final letter = sortedKeys[index];
-                            final contacts = groupedContacts[letter]!;
+                          // Danh sách liên hệ được phân theo bảng chữ cái
+                          Expanded(
+                            child: ListView.builder(
+                              itemCount: groupedContacts.length,
+                              itemBuilder: (context, index) {
+                                final sortedKeys = groupedContacts.keys.toList()
+                                  ..sort();
+                                final letter = sortedKeys[index];
+                                final contacts = groupedContacts[letter]!;
 
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Header chữ cái
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 8,
-                                  ),
-                                  child: Text(
-                                    letter,
-                                    style: const TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                      fontFamily: 'Caros',
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Header chữ cái
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 8,
+                                      ),
+                                      child: Text(
+                                        letter,
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                          fontFamily: 'Caros',
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ),
-                                // Danh sách liên hệ trong nhóm
-                                ...contacts.map(
-                                  (contact) => ContactItem(contact: contact),
-                                ),
-                                // Khoảng cách giữa các nhóm
-                                if (index < groupedContacts.length - 1)
-                                  const SizedBox(height: 8),
-                              ],
-                            );
-                          },
-                        ),
+                                    // Danh sách liên hệ trong nhóm
+                                    ...contacts.map((contact) {
+                                      // Tìm user tương ứng với contact
+                                      final user = users.firstWhere(
+                                        (u) => u.name == contact.name,
+                                        orElse: () => UserModel(
+                                          uid: '',
+                                          name: contact.name,
+                                          email: '',
+                                          isOnline: false,
+                                        ),
+                                      );
+                                      return ContactItem(
+                                        contact: contact,
+                                        user: user,
+                                      );
+                                    }),
+                                    // Khoảng cách giữa các nhóm
+                                    if (index < groupedContacts.length - 1)
+                                      const SizedBox(height: 8),
+                                  ],
+                                );
+                              },
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

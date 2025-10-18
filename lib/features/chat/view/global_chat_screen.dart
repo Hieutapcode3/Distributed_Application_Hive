@@ -25,6 +25,21 @@ class _GlobalChatScreenState extends ConsumerState<GlobalChatScreen> {
   final ScrollController _scrollController = ScrollController();
   final uuid = const Uuid();
 
+  @override
+  void initState() {
+    super.initState();
+    // Auto-scroll xuống dưới cùng khi màn hình được mở
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToBottom();
+    });
+  }
+
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    }
+  }
+
   void _sendMessage() {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
@@ -45,13 +60,7 @@ class _GlobalChatScreenState extends ConsumerState<GlobalChatScreen> {
 
     // Cuộn xuống tin nhắn mới
     Future.delayed(const Duration(milliseconds: 150), () {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      }
+      _scrollToBottom();
     });
   }
 
@@ -80,6 +89,11 @@ class _GlobalChatScreenState extends ConsumerState<GlobalChatScreen> {
                     box.values.where((m) => m.roomId == "global").toList()
                       ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
                 print("Total messages in global chat: ${messages.length}");
+
+                // Auto-scroll khi có tin nhắn mới
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  _scrollToBottom();
+                });
 
                 if (messages.isEmpty) {
                   return const Center(

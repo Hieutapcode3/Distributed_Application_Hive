@@ -16,24 +16,30 @@ class UserModel {
   @HiveField(3)
   String? profilePictureUrl;
 
+  @HiveField(4)
+  bool isOnline;
+
   UserModel({
     required this.uid,
     required this.name,
     required this.email,
     this.profilePictureUrl,
+    this.isOnline = false,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
-        uid: json['uid'] ?? '',
-        name: json['name'] ?? '',
-        email: json['email'] ?? '',
-        profilePictureUrl: json['profilePictureUrl'],
-      );
+    uid: json['uid'] ?? '',
+    name: json['name'] ?? '',
+    email: json['email'] ?? '',
+    profilePictureUrl: json['profilePictureUrl'],
+    isOnline: json['isOnline'] ?? false,
+  );
 
   Map<String, dynamic> toJson() => {
-        'uid': uid,
-        'name': name,
-        'email': email,
-        'profilePictureUrl': profilePictureUrl,
-      };
+    'uid': uid,
+    'name': name,
+    'email': email,
+    'profilePictureUrl': profilePictureUrl,
+    'isOnline': isOnline,
+  };
 }

@@ -4,6 +4,7 @@ import 'package:distributed_application_hive/features/auth/data/user_model.dart'
 import 'package:distributed_application_hive/features/chat/data/message_model.dart';
 import 'package:distributed_application_hive/features/chat/view/global_chat_screen.dart';
 import 'package:distributed_application_hive/features/home/widgets/chat_list_item.dart';
+import 'package:distributed_application_hive/features/home/utils/chat_helpers.dart';
 
 class ChatList extends StatelessWidget {
   final UserModel currentUser;
@@ -23,6 +24,9 @@ class ChatList extends StatelessWidget {
             .where((u) => u.uid != currentUser.uid)
             .toList();
 
+        // Lấy tin nhắn mới nhất của global chat
+        final latestGlobalMessage = ChatHelpers.getLatestGlobalMessage();
+
         return ListView(
           children: [
             // Global Chat (nhóm chung)
@@ -39,9 +43,18 @@ class ChatList extends StatelessWidget {
                   fontFamily: 'Circular Std',
                 ),
               ),
-              subtitle: const Text(
-                "Nhắn tin với tất cả mọi người",
-                style: TextStyle(fontFamily: 'Circular Std'),
+              subtitle: Text(
+                latestGlobalMessage != null
+                    ? "${latestGlobalMessage.senderName}: ${latestGlobalMessage.content}"
+                    : "Chưa có tin nhắn nào",
+                style: TextStyle(
+                  fontFamily: 'Circular Std',
+                  color: latestGlobalMessage != null
+                      ? Colors.grey[600]
+                      : Colors.grey[400],
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
               onTap: () {
                 Navigator.push(

@@ -35,29 +35,12 @@ class UserAvatarList extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: Column(
                   children: [
-                    Stack(
-                      children: [
-                        CircleAvatar(
-                          radius: 30,
-                          backgroundImage: user.profilePictureUrl != null
-                              ? NetworkImage(user.profilePictureUrl!)
-                              : const AssetImage('assets/image/mtp.jpg')
-                                    as ImageProvider,
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: Container(
-                            width: 14,
-                            height: 14,
-                            decoration: BoxDecoration(
-                              color: Colors.green,
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.black, width: 2),
-                            ),
-                          ),
-                        ),
-                      ],
+                    CircleAvatar(
+                      radius: 30,
+                      backgroundImage: user.profilePictureUrl != null
+                          ? NetworkImage(user.profilePictureUrl!)
+                          : const AssetImage('assets/image/mtp.jpg')
+                                as ImageProvider,
                     ),
                     const SizedBox(height: 6),
                     Text(
