@@ -8,15 +8,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/adapters.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await Hive.initFlutter();
   Hive.registerAdapter(UserModelAdapter());
   Hive.registerAdapter(MessageModelAdapter());
   Hive.registerAdapter(ChatRoomModelAdapter());
+
+  // Xóa dữ liệu cũ để tránh conflict với cấu trúc mới
+  try {
+    await Hive.deleteBoxFromDisk('userBox');
+    await Hive.deleteBoxFromDisk('currentUserBox');
+    await Hive.deleteBoxFromDisk('messageBox');
+    await Hive.deleteBoxFromDisk('chatRoomBox');
+  } catch (e) {
+    // Box có thể chưa tồn tại, bỏ qua lỗi
+    print('Box chưa tồn tại hoặc đã được xóa: $e');
+  }
+
   await Hive.openBox<UserModel>('userBox');
   await Hive.openBox<UserModel>('currentUserBox');
   await Hive.openBox<MessageModel>('messageBox');
