@@ -13,6 +13,12 @@ class UserAvatarList extends StatelessWidget {
       builder: (context, Box<UserModel> box, _) {
         final users = box.values.toList();
 
+         print('=== DANH SÁCH USER CẬP NHẬT ===');
+  for (var u in users) {
+    print('${u.name} | Online: ${u.isOnline}');
+  }
+  print('===============================');
+
         if (users.isEmpty) {
           return const Padding(
             padding: EdgeInsets.all(16),

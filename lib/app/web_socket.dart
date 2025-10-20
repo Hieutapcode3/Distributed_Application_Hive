@@ -24,11 +24,9 @@ class WebSocketService {
 
     channel = IOWebSocketChannel.connect('wss://chat-server-00oc.onrender.com');
 
-    channel!.sink.add(
-      jsonEncode({'type': 'connect', 'user': currentUser.toJson()}),
-    );
+    channel!.sink.add(jsonEncode({'type': 'connect', 'user': currentUser.toJson()}));
 
-    channel!.stream.listen((message) {
+    channel!.stream.listen((message) async {
       final data = jsonDecode(message);
       switch (data['type']) {
         case 'init':
@@ -47,37 +45,34 @@ class WebSocketService {
           break;
 
         case 'user_online':
-          // Cập nhật trạng thái online của user
           final user = userBox.get(data['uid']);
-          if (user != null) {
-            user.isOnline = true;
-            userBox.put(data['uid'], user);
+          if (user == null) {
+            print('User ${data['uid']} chưa có trong Hive khi nhận user_online');
+          } else {
+            final updatedUser = user.copyWith(isOnline: true);
+            await userBox.put(data['uid'], updatedUser);
+            print('${updatedUser.name} vừa online');
           }
+
           break;
 
         case 'user_offline':
-          // Cập nhật trạng thái offline của user
           final user = userBox.get(data['uid']);
           if (user != null) {
-            user.isOnline = false;
-            userBox.put(data['uid'], user);
+            final updatedUser = user.copyWith(isOnline: false);
+            await userBox.put(data['uid'], updatedUser);
+            print('${updatedUser.name} vừa offline');
           }
           break;
 
         case 'message':
           // Đồng bộ tin nhắn mới
-          messageBox.put(
-            data['message']['id'],
-            MessageModel.fromJson(data['message']),
-          );
+          messageBox.put(data['message']['id'], MessageModel.fromJson(data['message']));
           break;
 
         case 'message_update':
           // Cập nhật tin nhắn đã có
-          messageBox.put(
-            data['message']['id'],
-            MessageModel.fromJson(data['message']),
-          );
+          messageBox.put(data['message']['id'], MessageModel.fromJson(data['message']));
           break;
 
         case 'message_delete':
@@ -97,23 +92,17 @@ class WebSocketService {
 
   void sendMessage(MessageModel message) {
     if (channel == null) return;
-    channel!.sink.add(
-      jsonEncode({'type': 'message', 'message': message.toJson()}),
-    );
+    channel!.sink.add(jsonEncode({'type': 'message', 'message': message.toJson()}));
   }
 
   void updateMessage(MessageModel message) {
     if (channel == null) return;
-    channel!.sink.add(
-      jsonEncode({'type': 'message_update', 'message': message.toJson()}),
-    );
+    channel!.sink.add(jsonEncode({'type': 'message_update', 'message': message.toJson()}));
   }
 
   void deleteMessage(String messageId) {
     if (channel == null) return;
-    channel!.sink.add(
-      jsonEncode({'type': 'message_delete', 'messageId': messageId}),
-    );
+    channel!.sink.add(jsonEncode({'type': 'message_delete', 'messageId': messageId}));
   }
 
   void requestMessageSync(String userId) {
