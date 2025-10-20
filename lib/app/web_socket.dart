@@ -32,9 +32,11 @@ class WebSocketService {
       final data = jsonDecode(message);
       switch (data['type']) {
         case 'init':
+          // Đồng bộ danh sách user
           for (var u in data['users']) {
             userBox.put(u['uid'], UserModel.fromJson(u));
           }
+          // Đồng bộ tin nhắn
           for (var m in data['messages']) {
             messageBox.put(m['id'], MessageModel.fromJson(m));
           }
@@ -44,11 +46,50 @@ class WebSocketService {
           userBox.put(data['user']['uid'], UserModel.fromJson(data['user']));
           break;
 
+        case 'user_online':
+          // Cập nhật trạng thái online của user
+          final user = userBox.get(data['uid']);
+          if (user != null) {
+            user.isOnline = true;
+            userBox.put(data['uid'], user);
+          }
+          break;
+
+        case 'user_offline':
+          // Cập nhật trạng thái offline của user
+          final user = userBox.get(data['uid']);
+          if (user != null) {
+            user.isOnline = false;
+            userBox.put(data['uid'], user);
+          }
+          break;
+
         case 'message':
+          // Đồng bộ tin nhắn mới
           messageBox.put(
             data['message']['id'],
             MessageModel.fromJson(data['message']),
           );
+          break;
+
+        case 'message_update':
+          // Cập nhật tin nhắn đã có
+          messageBox.put(
+            data['message']['id'],
+            MessageModel.fromJson(data['message']),
+          );
+          break;
+
+        case 'message_delete':
+          // Xóa tin nhắn
+          messageBox.delete(data['messageId']);
+          break;
+
+        case 'sync_messages':
+          // Đồng bộ nhiều tin nhắn cùng lúc
+          for (var m in data['messages']) {
+            messageBox.put(m['id'], MessageModel.fromJson(m));
+          }
           break;
       }
     });
@@ -59,6 +100,35 @@ class WebSocketService {
     channel!.sink.add(
       jsonEncode({'type': 'message', 'message': message.toJson()}),
     );
+  }
+
+  void updateMessage(MessageModel message) {
+    if (channel == null) return;
+    channel!.sink.add(
+      jsonEncode({'type': 'message_update', 'message': message.toJson()}),
+    );
+  }
+
+  void deleteMessage(String messageId) {
+    if (channel == null) return;
+    channel!.sink.add(
+      jsonEncode({'type': 'message_delete', 'messageId': messageId}),
+    );
+  }
+
+  void requestMessageSync(String userId) {
+    if (channel == null) return;
+    channel!.sink.add(jsonEncode({'type': 'sync_messages', 'userId': userId}));
+  }
+
+  void setUserOnline(String uid) {
+    if (channel == null) return;
+    channel!.sink.add(jsonEncode({'type': 'user_online', 'uid': uid}));
+  }
+
+  void setUserOffline(String uid) {
+    if (channel == null) return;
+    channel!.sink.add(jsonEncode({'type': 'user_offline', 'uid': uid}));
   }
 
   void close() {

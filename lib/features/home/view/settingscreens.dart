@@ -14,13 +14,12 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  // Dữ liệu mẫu cho các mục cài đặt
   static const List<SettingItem> _settingItems = [
     SettingItem(
       title: "Account",
       subtitle: "Privacy, security, change number",
       iconPath: "key",
-      onTap: null, // Sẽ được xử lý trong widget
+      onTap: null,
     ),
     SettingItem(
       title: "Chat",
@@ -59,20 +58,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: const SettingsAppBar(),
-      body: Stack(
-        children: [
-          // Background
-          Container(color: Colors.black, child: const SizedBox(height: 30)),
-
-          // Draggable Bottom Sheet
-          DraggableScrollableSheet(
-            initialChildSize: 0.975,
-            minChildSize: 0.975, // Không thể kéo xuống dưới 0.975
-            maxChildSize: 1, // Chỉ có thể kéo lên đến full screen
-            snap: true, // Snap về các mức cố định
-            snapSizes: const [0.975, 1.0], // Chỉ có 2 mức: 0.975 và 1.0
-            builder: (context, scrollController) {
-              return Container(
+      body: Container(
+        color: Colors.black,
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
+            Expanded(
+              child: Container(
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
@@ -85,79 +77,65 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     'currentUserBox',
                   ).listenable(),
                   builder: (context, Box<UserModel> box, _) {
-                    final currentUsers = box.values.toList();
-                    final currentUser = currentUsers.isNotEmpty
-                        ? currentUsers.first
+                    final currentUser = box.values.isNotEmpty
+                        ? box.values.first
                         : null;
                     final userName = currentUser?.name ?? "User";
 
-                    return Column(
-                      children: [
-                        // Drag handle
-                        Container(
-                          margin: const EdgeInsets.only(top: 8),
-                          width: 40,
-                          height: 4,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[300],
-                            borderRadius: BorderRadius.circular(2),
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 12),
+
+                          // User info
+                          UserProfileSection(
+                            name: userName,
+                            status: "Never give up",
+                            avatar: "assets/image/mtp.jpg",
+                            emoji: "💪",
                           ),
-                        ),
-                        const SizedBox(height: 20),
+                          const Divider(
+                            height: 1,
+                            color: Color.fromARGB(49, 158, 158, 158),
+                          ),
 
-                        // User Profile Section
-                        UserProfileSection(
-                          name: userName,
-                          status: "Never give up",
-                          avatar: "assets/image/mtp.jpg",
-                          emoji: "💪",
-                        ),
-                        const SizedBox(height: 10),
-                        const Divider(
-                          height: 1,
-                          color: Color.fromARGB(49, 158, 158, 158),
-                        ),
-
-                        // Settings List với SingleChildScrollView
-                        Expanded(
-                          child: SingleChildScrollView(
-                            controller: scrollController,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 15,
-                            ),
-                            child: Column(
-                              children: _settingItems.map((settingItem) {
-                                return SettingItemWidget(
-                                  settingItem: SettingItem(
-                                    title: settingItem.title,
-                                    subtitle: settingItem.subtitle,
-                                    iconPath: settingItem.iconPath,
-                                    onTap: () {
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            '${settingItem.title} tapped!',
+                          Expanded(
+                            child: SingleChildScrollView(
+                              padding: const EdgeInsets.symmetric(vertical: 15),
+                              child: Column(
+                                children: _settingItems.map((item) {
+                                  return SettingItemWidget(
+                                    settingItem: SettingItem(
+                                      title: item.title,
+                                      subtitle: item.subtitle,
+                                      iconPath: item.iconPath,
+                                      onTap: () {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              '${item.title} tapped!',
+                                            ),
                                           ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                );
-                              }).toList(),
+                                        );
+                                      },
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     );
                   },
                 ),
-              );
-            },
-          ),
-        ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
