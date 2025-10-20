@@ -14,12 +14,12 @@ class UserModel {
   final String email;
 
   @HiveField(3)
-  String? profilePictureUrl;
+  final String? profilePictureUrl;
 
   @HiveField(4)
-  bool isOnline;
+  final bool isOnline;
 
-  UserModel({
+  const UserModel({
     required this.uid,
     required this.name,
     required this.email,
@@ -27,19 +27,36 @@ class UserModel {
     this.isOnline = false,
   });
 
+  // ✅ Thêm copyWith()
+  UserModel copyWith({
+    String? uid,
+    String? name,
+    String? email,
+    String? profilePictureUrl,
+    bool? isOnline,
+  }) {
+    return UserModel(
+      uid: uid ?? this.uid,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      profilePictureUrl: profilePictureUrl ?? this.profilePictureUrl,
+      isOnline: isOnline ?? this.isOnline,
+    );
+  }
+
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
-    uid: json['uid'] ?? '',
-    name: json['name'] ?? '',
-    email: json['email'] ?? '',
-    profilePictureUrl: json['profilePictureUrl'],
-    isOnline: json['isOnline'] ?? false,
-  );
+        uid: json['uid'] ?? '',
+        name: json['name'] ?? '',
+        email: json['email'] ?? '',
+        profilePictureUrl: json['profilePictureUrl'],
+        isOnline: json['isOnline'] ?? false,
+      );
 
   Map<String, dynamic> toJson() => {
-    'uid': uid,
-    'name': name,
-    'email': email,
-    'profilePictureUrl': profilePictureUrl,
-    'isOnline': isOnline,
-  };
+        'uid': uid,
+        'name': name,
+        'email': email,
+        'profilePictureUrl': profilePictureUrl,
+        'isOnline': isOnline,
+      };
 }

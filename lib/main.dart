@@ -8,15 +8,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/adapters.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await Hive.initFlutter();
   Hive.registerAdapter(UserModelAdapter());
   Hive.registerAdapter(MessageModelAdapter());
   Hive.registerAdapter(ChatRoomModelAdapter());
+
   await Hive.openBox<UserModel>('userBox');
   await Hive.openBox<UserModel>('currentUserBox');
   await Hive.openBox<MessageModel>('messageBox');
