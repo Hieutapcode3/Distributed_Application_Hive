@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:distributed_application_hive/features/auth/data/user_model.dart';
+import 'package:distributed_application_hive/features/home/widgets/avatar_with_online_status.dart';
 
 class UserAvatarList extends StatelessWidget {
   const UserAvatarList({super.key});
@@ -35,12 +36,10 @@ class UserAvatarList extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: Column(
                   children: [
-                    CircleAvatar(
+                    AvatarWithOnlineStatus(
+                      user: user,
                       radius: 30,
-                      backgroundImage: user.profilePictureUrl != null
-                          ? NetworkImage(user.profilePictureUrl!)
-                          : const AssetImage('assets/image/mtp.jpg')
-                                as ImageProvider,
+                      showOnlineStatus: true,
                     ),
                     const SizedBox(height: 6),
                     Text(
