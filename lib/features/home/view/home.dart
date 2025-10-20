@@ -36,16 +36,32 @@ class _DashboardScreenState extends ConsumerState<HomeScreen> {
     if (currentUser != null) {
       wsService = WebSocketService();
       wsService.connect(currentUser!);
+
+      // Đánh dấu user hiện tại là online
+      wsService.setUserOnline(currentUser!.uid);
     }
   }
 
   Future<void> _signOut() async {
-    final auth = ref.read(authServiceProvider);
+    // Đánh dấu user offline trước khi đăng xuất
+    if (currentUser != null) {
+      wsService.setUserOffline(currentUser!.uid);
+    }
 
+    final auth = ref.read(authServiceProvider);
     await auth.signOut();
     if (mounted) {
       Navigator.pop(context);
     }
+  }
+
+  @override
+  void dispose() {
+    // Đánh dấu user offline khi thoát màn hình
+    if (currentUser != null) {
+      wsService.setUserOffline(currentUser!.uid);
+    }
+    super.dispose();
   }
 
   @override
