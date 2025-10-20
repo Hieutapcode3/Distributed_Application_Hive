@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Chat App',
       theme: ThemeData.light(),
-      home: MainScreen(),
+      home: OnboardingScreen(),
     );
   }
 }
