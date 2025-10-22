@@ -8,27 +8,39 @@ class MessageModel extends HiveObject {
   String id; 
 
   @HiveField(1)
-  String roomId; 
+  String? roomId; // Nếu null → là chat 1:1
 
   @HiveField(2)
   String senderId;
 
   @HiveField(3)
-  String content;
+  String? receiverId; // Nếu null → là tin nhắn group
 
   @HiveField(4)
-  DateTime timestamp;
+  String content;
 
   @HiveField(5)
+  DateTime timestamp;
+
+  @HiveField(6)
   String senderName;
+
+  @HiveField(7)
+  bool isGroup; 
+
+  @HiveField(8)
+  List<String>? readBy; 
 
   MessageModel({
     required this.id,
-    required this.roomId,
+    this.roomId,
     required this.senderId,
+    this.receiverId,
     required this.content,
     required this.timestamp,
     required this.senderName,
+    this.isGroup = false,
+    this.readBy,
   });
 
   factory MessageModel.fromJson(Map<String, dynamic> json) {
@@ -36,9 +48,12 @@ class MessageModel extends HiveObject {
       id: json['id'],
       roomId: json['roomId'],
       senderId: json['senderId'],
+      receiverId: json['receiverId'],
       content: json['content'],
       timestamp: DateTime.parse(json['timestamp']),
       senderName: json['senderName'],
+      isGroup: json['isGroup'] ?? false,
+      readBy: (json['readBy'] as List?)?.map((e) => e.toString()).toList(),
     );
   }
 
@@ -47,9 +62,12 @@ class MessageModel extends HiveObject {
       'id': id,
       'roomId': roomId,
       'senderId': senderId,
+      'receiverId': receiverId,
       'content': content,
       'timestamp': timestamp.toIso8601String(),
       'senderName': senderName,
+      'isGroup': isGroup,
+      'readBy': readBy ?? [],
     };
   }
 }

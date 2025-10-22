@@ -5,7 +5,6 @@ import 'package:hive/hive.dart';
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final Box<UserModel> _userBox = Hive.box<UserModel>('userBox');
-  final Box<UserModel> _currentUserBox = Hive.box<UserModel>('currentUserBox');
 
   // ---------------- Email / Password ----------------
   Future<User?> registerWithEmail({required String name, required String email, required String password}) async {
@@ -17,7 +16,6 @@ class AuthService {
       final userModel = UserModel(uid: user!.uid, name: name, email: email);
 
       await _userBox.put(userModel.uid, userModel);
-      await _currentUserBox.put(userModel.uid, userModel);
       return user;
     } on FirebaseAuthException catch (e) {
       throw Exception(e.message);
@@ -34,7 +32,6 @@ class AuthService {
     final existingUser = _userBox.get(userModel.uid);
     if (existingUser == null || existingUser.uid != userModel.uid) {
       await _userBox.put(userModel.uid, userModel); 
-      await _currentUserBox.put(userModel.uid, userModel);
     }
 
     return user;
@@ -55,14 +52,18 @@ class AuthService {
     }
   }
 
-  Future<void> deleteUser() async {
-    try {
-      
-      await _userBox.clear();
-      await _currentUserBox.clear();
-      print("Deleted user data from Hive boxes.");
-    } catch (e) {
-      throw Exception('Error deleting user: $e');
-    }
+  UserModel? getUserByUid(String uid) {
+    return _userBox.get(uid);
   }
+
+  // Future<void> deleteUser() async {
+  //   try {
+      
+  //     await _userBox.clear();
+  //     await _currentUserBox.clear();
+  //     print("Deleted user data from Hive boxes.");
+  //   } catch (e) {
+  //     throw Exception('Error deleting user: $e');
+  //   }
+  // }
 }

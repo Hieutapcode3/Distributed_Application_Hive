@@ -16,6 +16,7 @@ void main() async {
   Hive.registerAdapter(MessageModelAdapter());
   Hive.registerAdapter(ChatRoomModelAdapter());
 
+
   await Hive.openBox<UserModel>('userBox');
   await Hive.openBox<UserModel>('currentUserBox');
   await Hive.openBox<MessageModel>('messageBox');

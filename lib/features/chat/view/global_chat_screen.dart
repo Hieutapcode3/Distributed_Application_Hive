@@ -47,6 +47,8 @@ class _GlobalChatScreenState extends ConsumerState<GlobalChatScreen> {
     final message = MessageModel(
       id: uuid.v4(),
       senderId: widget.currentUser.uid,
+      receiverId: null,
+      isGroup: true,
       senderName: widget.currentUser.name,
       timestamp: DateTime.now(),
       roomId: "global",

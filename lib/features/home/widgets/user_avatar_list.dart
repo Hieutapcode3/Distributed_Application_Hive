@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:distributed_application_hive/features/auth/data/user_model.dart';
@@ -12,21 +13,26 @@ class UserAvatarList extends StatelessWidget {
       valueListenable: Hive.box<UserModel>('userBox').listenable(),
       builder: (context, Box<UserModel> box, _) {
         final users = box.values.toList();
+        final firebaseUser = FirebaseAuth.instance.currentUser;
+        final currentUserUid = firebaseUser?.uid;
 
-         print('=== DANH SÁCH USER CẬP NHẬT ===');
-  for (var u in users) {
-    print('${u.name} | Online: ${u.isOnline}');
-  }
-  print('===============================');
+        users.sort((a, b) {
+          if (a.uid == currentUserUid) return -1; // a lên đầu
+          if (b.uid == currentUserUid) return 1; // b lên sau
+          return 0;
+        });
+
+        print('=== DANH SÁCH USER CẬP NHẬT ===');
+        for (var u in users) {
+          print('${u.name} | Online: ${u.isOnline}');
+        }
+        print('===============================');
 
         if (users.isEmpty) {
           return const Padding(
             padding: EdgeInsets.all(16),
             child: Center(
-              child: Text(
-                'Chưa có người dùng nào khác.',
-                style: TextStyle(color: Colors.white),
-              ),
+              child: Text('Chưa có người dùng nào khác.', style: TextStyle(color: Colors.white)),
             ),
           );
         }
@@ -42,19 +48,11 @@ class UserAvatarList extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: Column(
                   children: [
-                    AvatarWithOnlineStatus(
-                      user: user,
-                      radius: 30,
-                      showOnlineStatus: true,
-                    ),
+                    AvatarWithOnlineStatus(user: user, radius: 30, showOnlineStatus: true),
                     const SizedBox(height: 6),
                     Text(
                       user.name.split(' ').first,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontFamily: 'Caros',
-                      ),
+                      style: const TextStyle(color: Colors.white, fontSize: 14, fontFamily: 'Caros'),
                     ),
                   ],
                 ),

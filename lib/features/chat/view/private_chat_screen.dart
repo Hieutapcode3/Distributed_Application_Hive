@@ -10,7 +10,7 @@ final webSocketProvider = Provider<WebSocketService>((ref) => WebSocketService()
 
 class PrivateChatScreen extends ConsumerStatefulWidget {
   final UserModel currentUser;
-  final UserModel receiver; // 🆕 người nhận
+  final UserModel receiver; // người nhận
 
   const PrivateChatScreen({super.key, required this.currentUser, required this.receiver});
 
@@ -28,9 +28,9 @@ class _PrivateChatScreenState extends ConsumerState<PrivateChatScreen> {
   @override
   void initState() {
     super.initState();
-    // 🆕 Tạo roomId cố định cho 2 người (tránh trùng)
+
     final ids = [widget.currentUser.uid, widget.receiver.uid]..sort();
-    roomId = ids.join('_');
+  roomId = ids.join('_');
 
     // Auto-scroll xuống dưới cùng khi màn hình được mở
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -56,6 +56,8 @@ class _PrivateChatScreenState extends ConsumerState<PrivateChatScreen> {
       senderName: widget.currentUser.name,
       timestamp: DateTime.now(),
       roomId: roomId,
+      receiverId: widget.receiver.uid,
+      isGroup: false,
       content: text,
     );
 
