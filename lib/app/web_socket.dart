@@ -23,6 +23,7 @@ class WebSocketService {
         : await Hive.openBox<MessageModel>('messageBox');
 
     channel = IOWebSocketChannel.connect('wss://chat-server-00oc.onrender.com');
+    // channel = IOWebSocketChannel.connect('ws://10.0.2.2:8080');
 
     channel!.sink.add(jsonEncode({'type': 'connect', 'user': currentUser.toJson()}));
 

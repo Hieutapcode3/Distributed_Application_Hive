@@ -91,6 +91,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           // User info
                           UserProfileSection(
                             name: userName,
+                            email: currentUser?.email ?? "",
                             status: "Never give up",
                             avatar: "assets/image/mtp.jpg",
                             emoji: "💪",

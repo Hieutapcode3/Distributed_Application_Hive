@@ -7,9 +7,7 @@ import 'package:distributed_application_hive/features/auth/data/user_model.dart'
 import 'package:distributed_application_hive/app/web_socket.dart';
 
 // 🔹 Provider cho WebSocketService
-final webSocketProvider = Provider<WebSocketService>(
-  (ref) => WebSocketService(),
-);
+final webSocketProvider = Provider<WebSocketService>((ref) => WebSocketService());
 
 class GlobalChatScreen extends ConsumerStatefulWidget {
   final UserModel currentUser;
@@ -85,9 +83,8 @@ class _GlobalChatScreenState extends ConsumerState<GlobalChatScreen> {
             child: ValueListenableBuilder(
               valueListenable: messageBox.listenable(),
               builder: (context, Box<MessageModel> box, _) {
-                final messages =
-                    box.values.where((m) => m.roomId == "global").toList()
-                      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+                final messages = box.values.where((m) => m.roomId == "global").toList()
+                  ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
                 print("Total messages in global chat: ${messages.length}");
 
                 // Auto-scroll khi có tin nhắn mới
@@ -97,93 +94,112 @@ class _GlobalChatScreenState extends ConsumerState<GlobalChatScreen> {
 
                 if (messages.isEmpty) {
                   return const Center(
-                    child: Text(
-                      '💬 Chưa có tin nhắn nào',
-                      style: TextStyle(color: Colors.white70),
-                    ),
+                    child: Text('💬 Chưa có tin nhắn nào', style: TextStyle(color: Colors.white70)),
                   );
                 }
 
                 return ListView.builder(
                   controller: _scrollController,
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 10,
-                    horizontal: 12,
-                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
                     final msg = messages[index];
                     final isMe = msg.senderId == widget.currentUser.uid;
 
-                    return Align(
-                      alignment: isMe
-                          ? Alignment.centerRight
-                          : Alignment.centerLeft,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (!isMe)
-                            Padding(
-                              padding: const EdgeInsets.only(right: 8),
-                              child: CircleAvatar(
-                                radius: 20,
-                                backgroundImage: AssetImage(
-                                  'assets/image/mtp.jpg',
+                    final currenDate = DateUtils.dateOnly(msg.timestamp);
+
+                    bool showDateHeader = false;
+                    if (index == 0) {
+                      showDateHeader = true;
+                    } else {
+                      final prevMsg = messages[index - 1];
+                      final prevDate = DateUtils.dateOnly(prevMsg.timestamp);
+                      if (currenDate.isAfter(prevDate)) {
+                        showDateHeader = true;
+                      }
+                    }
+
+                    String formattedDate;
+                    final now = DateTime.now();
+                    if (currenDate == DateUtils.dateOnly(now)) {
+                      formattedDate = "Hôm nay";
+                    } else if (currenDate == DateUtils.dateOnly(now.subtract(const Duration(days: 1)))) {
+                      formattedDate = "Hôm qua";
+                    } else {
+                      formattedDate = "${currenDate.day}/${currenDate.month}/${currenDate.year}";
+                    }
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        if (showDateHeader)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            child: Center(
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[300],
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
+                                child: Text(formattedDate, style: const TextStyle(color: Colors.black54, fontSize: 12)),
                               ),
                             ),
+                          ),
 
-                          Column(
-                            crossAxisAlignment: isMe
-                                ? CrossAxisAlignment.end
-                                : CrossAxisAlignment.start,
+                        Align(
+                          alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               if (!isMe)
                                 Padding(
-                                  padding: const EdgeInsets.only(bottom: 2),
-                                  child: Text(
-                                    msg.senderName,
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.black87,
-                                      fontWeight: FontWeight.bold,
+                                  padding: const EdgeInsets.only(right: 8),
+                                  child: CircleAvatar(radius: 20, backgroundImage: AssetImage('assets/image/mtp.jpg')),
+                                ),
+
+                              Column(
+                                crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                                children: [
+                                  if (!isMe)
+                                    Padding(
+                                      padding: const EdgeInsets.only(bottom: 2),
+                                      child: Text(
+                                        msg.senderName,
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.black87,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+
+                                  Container(
+                                    margin: const EdgeInsets.symmetric(vertical: 2),
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: isMe
+                                          ? const Color.fromRGBO(32, 160, 144, 1)
+                                          : const Color.fromRGBO(242, 247, 251, 1),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Text(msg.content, style: const TextStyle(color: Colors.black, fontSize: 15)),
+                                  ),
+
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 2),
+                                    child: Text(
+                                      '${msg.timestamp.hour}:${msg.timestamp.minute.toString().padLeft(2, '0')}',
+                                      style: TextStyle(fontSize: 10, color: Colors.black54),
                                     ),
                                   ),
-                                ),
-
-                              Container(
-                                margin: const EdgeInsets.symmetric(vertical: 2),
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: isMe
-                                      ? const Color.fromRGBO(32, 160, 144, 1)
-                                      : const Color.fromRGBO(242, 247, 251, 1),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Text(
-                                  msg.content,
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 15,
-                                  ),
-                                ),
-                              ),
-
-                              Padding(
-                                padding: const EdgeInsets.only(top: 2),
-                                child: Text(
-                                  '${msg.timestamp.hour}:${msg.timestamp.minute.toString().padLeft(2, '0')}',
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    color: Colors.black54,
-                                  ),
-                                ),
+                                ],
                               ),
                             ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     );
                   },
                 );
@@ -205,14 +221,8 @@ class _GlobalChatScreenState extends ConsumerState<GlobalChatScreen> {
                       hintStyle: const TextStyle(color: Colors.white54),
                       filled: true,
                       fillColor: Colors.grey[850],
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide: BorderSide.none,
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 10,
-                      ),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     ),
                     onSubmitted: (_) => _sendMessage(),
                   ),
