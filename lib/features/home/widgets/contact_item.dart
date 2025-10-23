@@ -40,9 +40,7 @@ class ContactItem extends StatelessWidget {
         ],
       ),
       onTap: () {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Tapped on ${contact.name}')));
+        // TODO: Implement contact item tap functionality
       },
     );
   }

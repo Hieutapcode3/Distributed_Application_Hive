@@ -64,7 +64,10 @@ class _DashboardScreenState extends ConsumerState<HomeScreen> {
     await auth.signOut();
 
     if (mounted) {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const OnboardingScreen()));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const OnboardingScreen()),
+      );
     }
   }
 
@@ -84,7 +87,12 @@ class _DashboardScreenState extends ConsumerState<HomeScreen> {
         automaticallyImplyLeading: false,
         title: const Text(
           'Home',
-          style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold, fontFamily: 'Caros'),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Caros',
+          ),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -94,12 +102,20 @@ class _DashboardScreenState extends ConsumerState<HomeScreen> {
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: const Color.fromARGB(180, 255, 255, 255), width: 1),
+              border: Border.all(
+                color: const Color.fromARGB(180, 255, 255, 255),
+                width: 1,
+              ),
             ),
-            child: Image.asset('assets/image/Search.png', width: 24, height: 24, color: Colors.white),
+            child: Image.asset(
+              'assets/image/Search.png',
+              width: 24,
+              height: 24,
+              color: Colors.white,
+            ),
           ),
           onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Search tapped!')));
+            // TODO: Implement search functionality
           },
         ),
         actions: [
@@ -130,10 +146,16 @@ class _DashboardScreenState extends ConsumerState<HomeScreen> {
                     child: Container(
                       decoration: const BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.only(topLeft: Radius.circular(40), topRight: Radius.circular(40)),
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(40),
+                          topRight: Radius.circular(40),
+                        ),
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: 12,
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -149,7 +171,9 @@ class _DashboardScreenState extends ConsumerState<HomeScreen> {
                             const SizedBox(height: 16),
 
                             //  Danh sách chat (Global + User)
-                            Expanded(child: ChatList(currentUser: currentUser!)),
+                            Expanded(
+                              child: ChatList(currentUser: currentUser!),
+                            ),
                           ],
                         ),
                       ),

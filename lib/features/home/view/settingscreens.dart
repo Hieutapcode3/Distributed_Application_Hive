@@ -16,12 +16,42 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   static const List<SettingItem> _settingItems = [
-    SettingItem(title: "Account", subtitle: "Privacy, security, change number", iconPath: "key", onTap: null),
-    SettingItem(title: "Chat", subtitle: "Chat history, theme, wallpapers", iconPath: "chat", onTap: null),
-    SettingItem(title: "Notifications", subtitle: "Messages, group and others", iconPath: "notifications", onTap: null),
-    SettingItem(title: "Help", subtitle: "Help center, contact us, privacy policy", iconPath: "help", onTap: null),
-    SettingItem(title: "Storage and data", subtitle: "Network usage, storage usage", iconPath: "storage", onTap: null),
-    SettingItem(title: "Invite a friend", subtitle: "", iconPath: "invite", onTap: null),
+    SettingItem(
+      title: "Account",
+      subtitle: "Privacy, security, change number",
+      iconPath: "key",
+      onTap: null,
+    ),
+    SettingItem(
+      title: "Chat",
+      subtitle: "Chat history, theme, wallpapers",
+      iconPath: "chat",
+      onTap: null,
+    ),
+    SettingItem(
+      title: "Notifications",
+      subtitle: "Messages, group and others",
+      iconPath: "notifications",
+      onTap: null,
+    ),
+    SettingItem(
+      title: "Help",
+      subtitle: "Help center, contact us, privacy policy",
+      iconPath: "help",
+      onTap: null,
+    ),
+    SettingItem(
+      title: "Storage and data",
+      subtitle: "Network usage, storage usage",
+      iconPath: "storage",
+      onTap: null,
+    ),
+    SettingItem(
+      title: "Invite a friend",
+      subtitle: "",
+      iconPath: "invite",
+      onTap: null,
+    ),
   ];
 
   late Box<UserModel> userBox;
@@ -66,7 +96,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Container(
                 decoration: const BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.only(topLeft: Radius.circular(40), topRight: Radius.circular(40)),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(40),
+                    topRight: Radius.circular(40),
+                  ),
                 ),
                 child: ValueListenableBuilder(
                   valueListenable: Hive.box<UserModel>('userBox').listenable(),
@@ -77,7 +110,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     currentUser = box.get(firebaseUser.uid);
 
                     return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                        horizontal: 12,
+                      ),
                       child: Column(
                         children: [
                           const SizedBox(height: 12),
@@ -93,7 +129,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             child: ListView.separated(
                               padding: const EdgeInsets.symmetric(vertical: 8),
                               itemCount: _settingItems.length,
-                              separatorBuilder: (_, __) => const Divider(height: 1, color: Colors.grey),
+                              separatorBuilder: (_, __) =>
+                                  const Divider(height: 1, color: Colors.grey),
                               itemBuilder: (context, index) {
                                 final item = _settingItems[index];
                                 return SettingItemWidget(
@@ -102,9 +139,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     subtitle: item.subtitle,
                                     iconPath: item.iconPath,
                                     onTap: () {
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(SnackBar(content: Text('${item.title} tapped!')));
+                                      // TODO: Implement ${item.title} functionality
                                     },
                                   ),
                                 );

@@ -99,9 +99,7 @@ class CallItem extends StatelessWidget {
         ],
       ),
       onTap: () {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Tapped on $name')));
+        // TODO: Implement call item tap functionality
       },
     );
   }
