@@ -87,68 +87,63 @@ class ChatHelpers {
     }
   }
 
-  // Helper function để lấy tin nhắn gần nhất giữa 2 user
-  static MessageModel? getLatestMessage(
-    String currentUserId,
-    String otherUserId,
-  ) {
+  //  Lấy tin nhắn mới nhất (1:1 hoặc nhóm)
+  static MessageModel? getLatestMessage(String currentUserId, String otherId) {
     final messageBox = Hive.box<MessageModel>('messageBox');
+
     final messages = messageBox.values.where((message) {
-      // Lấy tin nhắn giữa 2 user (không phải global chat)
-      return message.roomId != 'global' &&
-          ((message.senderId == currentUserId &&
-                  message.roomId.contains(otherUserId)) ||
-              (message.senderId == otherUserId &&
-                  message.roomId.contains(currentUserId)));
+      if (!message.isGroup) {
+        return (message.senderId == currentUserId && message.receiverId == otherId) ||
+            (message.senderId == otherId && message.receiverId == currentUserId);
+      }
+
+      return message.isGroup && message.roomId == otherId;
     }).toList();
 
     if (messages.isEmpty) return null;
 
-    // Sắp xếp theo thời gian và lấy tin nhắn mới nhất
     messages.sort((a, b) => b.timestamp.compareTo(a.timestamp));
     return messages.first;
   }
 
-  // Helper function để đếm tin nhắn chưa đọc
-  static int getUnreadCount(String currentUserId, String otherUserId) {
+  // Đếm số tin nhắn chưa đọc
+  static int getUnreadCount(String currentUserId, String targetId, {bool isGroup = false}) {
     final messageBox = Hive.box<MessageModel>('messageBox');
+
     final messages = messageBox.values.where((message) {
-      return message.roomId != 'global' &&
-          message.senderId == otherUserId &&
-          message.roomId.contains(currentUserId);
+      if (isGroup) {
+        // Tin nhắn nhóm: user chưa xem
+        return message.isGroup && message.roomId == targetId && message.senderId != currentUserId;
+      } else {
+        // Chat 1:1
+        return !message.isGroup && message.receiverId == currentUserId && message.senderId == targetId;
+      }
     }).toList();
 
-    // Tạm thời trả về số random để demo (sau này có thể lưu trạng thái đã đọc)
     return messages.length > 0 ? (messages.length % 5) + 1 : 0;
   }
 
-  // Helper function để xóa tất cả tin nhắn giữa 2 user
+  //  Xóa toàn bộ tin nhắn giữa 2 user (1:1)
   static void deleteChatWithUser(String currentUserId, String otherUserId) {
     final messageBox = Hive.box<MessageModel>('messageBox');
     final messagesToDelete = messageBox.values.where((message) {
-      return message.roomId != 'global' &&
-          ((message.senderId == currentUserId &&
-                  message.roomId.contains(otherUserId)) ||
-              (message.senderId == otherUserId &&
-                  message.roomId.contains(currentUserId)));
+      return !message.isGroup &&
+          ((message.senderId == currentUserId && message.receiverId == otherUserId) ||
+              (message.senderId == otherUserId && message.receiverId == currentUserId));
     }).toList();
 
-    // Xóa từng tin nhắn
     for (final message in messagesToDelete) {
       messageBox.delete(message.id);
     }
   }
 
-  // Helper function để lấy tin nhắn mới nhất của global chat
+  //  Lấy tin nhắn mới nhất trong global chat
   static MessageModel? getLatestGlobalMessage() {
     final messageBox = Hive.box<MessageModel>('messageBox');
-    final messages = messageBox.values.where((message) {
-      return message.roomId == 'global';
-    }).toList();
+    final messages = messageBox.values.where((message) => message.roomId == 'global').toList();
 
     if (messages.isEmpty) return null;
 
-    // Sắp xếp theo thời gian và lấy tin nhắn mới nhất
     messages.sort((a, b) => b.timestamp.compareTo(a.timestamp));
     return messages.first;
   }
@@ -157,10 +152,7 @@ class ChatHelpers {
   static void handleNotice(BuildContext context, String userName) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          "Đã bật thông báo cho $userName",
-          style: const TextStyle(fontFamily: 'Circular Std'),
-        ),
+        content: Text("Đã bật thông báo cho $userName", style: const TextStyle(fontFamily: 'Circular Std')),
         backgroundColor: Colors.green,
       ),
     );

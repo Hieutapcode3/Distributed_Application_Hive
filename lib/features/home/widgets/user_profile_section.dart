@@ -5,6 +5,7 @@ class UserProfileSection extends StatelessWidget {
   final String status;
   final String avatar;
   final String emoji;
+  final String email;
 
   const UserProfileSection({
     super.key,
@@ -12,6 +13,7 @@ class UserProfileSection extends StatelessWidget {
     required this.status,
     required this.avatar,
     required this.emoji,
+    required this.email,
   });
 
   @override
@@ -34,6 +36,15 @@ class UserProfileSection extends StatelessWidget {
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'Caros',
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  email,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                    fontFamily: 'Circular Std',
                   ),
                 ),
                 const SizedBox(height: 4),

@@ -21,9 +21,7 @@ class UserModelAdapter extends TypeAdapter<UserModel> {
       name: fields[1] as String,
       email: fields[2] as String,
       profilePictureUrl: fields[3] as String?,
-      isOnline: numOfFields > 4
-          ? (fields[4] as bool? ?? false)
-          : false, // Xử lý dữ liệu cũ chỉ có 4 field
+      isOnline: fields[4] as bool,
     );
   }
 

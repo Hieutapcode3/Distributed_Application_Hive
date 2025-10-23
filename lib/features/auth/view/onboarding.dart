@@ -63,8 +63,8 @@ class OnboardingScreen extends ConsumerWidget {
                 SignInButton(
                   Buttons.google,
                   onPressed: () {
-                    final auth = ref.read(authServiceProvider);
-                    auth.deleteUser();
+                    // final auth = ref.read(authServiceProvider);
+                    // auth.deleteUser();
                   },
                 ),
                 SignInButton(
