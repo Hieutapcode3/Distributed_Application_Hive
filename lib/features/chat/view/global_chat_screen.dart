@@ -50,7 +50,7 @@ class _GlobalChatScreenState extends ConsumerState<GlobalChatScreen> {
       receiverId: null,
       isGroup: true,
       senderName: widget.currentUser.name,
-      timestamp: DateTime.now(),
+      timestamp: DateTime.now().toUtc(),
       roomId: "global",
       content: text,
     );
@@ -80,13 +80,16 @@ class _GlobalChatScreenState extends ConsumerState<GlobalChatScreen> {
       ),
       body: Column(
         children: [
-          // 🔹 Danh sách tin nhắn
+          //  Danh sách tin nhắn
           Expanded(
             child: ValueListenableBuilder(
               valueListenable: messageBox.listenable(),
               builder: (context, Box<MessageModel> box, _) {
-                final messages = box.values.where((m) => m.roomId == "global").toList()
-                  ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+                final messages = box.values.where((m) => m.roomId == "global").map((m) {
+                  final ts = m.timestamp.isUtc ? m.timestamp : m.timestamp.toUtc();
+                  return m.copyWith(timestamp: ts);
+                }).toList()..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+
                 print("Total messages in global chat: ${messages.length}");
 
                 // Auto-scroll khi có tin nhắn mới
@@ -107,28 +110,33 @@ class _GlobalChatScreenState extends ConsumerState<GlobalChatScreen> {
                   itemBuilder: (context, index) {
                     final msg = messages[index];
                     final isMe = msg.senderId == widget.currentUser.uid;
-
-                    final currenDate = DateUtils.dateOnly(msg.timestamp);
+                    final localTime = msg.timestamp.toLocal();
 
                     bool showDateHeader = false;
                     if (index == 0) {
                       showDateHeader = true;
                     } else {
                       final prevMsg = messages[index - 1];
-                      final prevDate = DateUtils.dateOnly(prevMsg.timestamp);
-                      if (currenDate.isAfter(prevDate)) {
+                      final currentDateUtc = DateUtils.dateOnly(msg.timestamp.toUtc());
+                      final prevDateUtc = DateUtils.dateOnly(prevMsg.timestamp.toUtc());
+                      if (currentDateUtc.isAfter(prevDateUtc)) {
                         showDateHeader = true;
                       }
                     }
 
+                    final nowUtc = DateTime.now().toUtc();
+                    final localDate = msg.timestamp.toLocal();
+                    final currentDateUtc = DateUtils.dateOnly(localDate.toUtc());
+                    final todayUtc = DateUtils.dateOnly(nowUtc);
+                    final yesterdayUtc = DateUtils.dateOnly(nowUtc.subtract(const Duration(days: 1)));
+
                     String formattedDate;
-                    final now = DateTime.now();
-                    if (currenDate == DateUtils.dateOnly(now)) {
+                    if (currentDateUtc == todayUtc) {
                       formattedDate = "Hôm nay";
-                    } else if (currenDate == DateUtils.dateOnly(now.subtract(const Duration(days: 1)))) {
+                    } else if (currentDateUtc == yesterdayUtc) {
                       formattedDate = "Hôm qua";
                     } else {
-                      formattedDate = "${currenDate.day}/${currenDate.month}/${currenDate.year}";
+                      formattedDate = "${localDate.day}/${localDate.month}/${localDate.year}";
                     }
 
                     return Column(
@@ -192,7 +200,7 @@ class _GlobalChatScreenState extends ConsumerState<GlobalChatScreen> {
                                   Padding(
                                     padding: const EdgeInsets.only(top: 2),
                                     child: Text(
-                                      '${msg.timestamp.hour}:${msg.timestamp.minute.toString().padLeft(2, '0')}',
+                                      '${localTime.hour}:${localTime.minute.toString().padLeft(2, '0')}',
                                       style: TextStyle(fontSize: 10, color: Colors.black54),
                                     ),
                                   ),

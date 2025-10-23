@@ -30,7 +30,7 @@ class _PrivateChatScreenState extends ConsumerState<PrivateChatScreen> {
     super.initState();
 
     final ids = [widget.currentUser.uid, widget.receiver.uid]..sort();
-  roomId = ids.join('_');
+    roomId = ids.join('_');
 
     // Auto-scroll xuống dưới cùng khi màn hình được mở
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -54,7 +54,7 @@ class _PrivateChatScreenState extends ConsumerState<PrivateChatScreen> {
       id: uuid.v4(),
       senderId: widget.currentUser.uid,
       senderName: widget.currentUser.name,
-      timestamp: DateTime.now(),
+      timestamp: DateTime.now().toUtc(),
       roomId: roomId,
       receiverId: widget.receiver.uid,
       isGroup: false,
@@ -99,8 +99,10 @@ class _PrivateChatScreenState extends ConsumerState<PrivateChatScreen> {
             child: ValueListenableBuilder(
               valueListenable: messageBox.listenable(),
               builder: (context, Box<MessageModel> box, _) {
-                final messages = box.values.where((m) => m.roomId == roomId).toList()
-                  ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+                final messages = box.values.where((m) => m.roomId == roomId).map((m) {
+                  final ts = m.timestamp.isUtc ? m.timestamp : m.timestamp.toUtc();
+                  return m.copyWith(timestamp: ts);
+                }).toList()..sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
                 // Auto-scroll khi có tin nhắn mới
                 WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -121,33 +123,39 @@ class _PrivateChatScreenState extends ConsumerState<PrivateChatScreen> {
                     final msg = messages[index];
                     final isMe = msg.senderId == widget.currentUser.uid;
 
-                    final currenDate = DateUtils.dateOnly(msg.timestamp);
+                    final localTime = msg.timestamp.toLocal();
 
                     bool showDateHeader = false;
                     if (index == 0) {
                       showDateHeader = true;
                     } else {
                       final prevMsg = messages[index - 1];
-                      final prevDate = DateUtils.dateOnly(prevMsg.timestamp);
-                      if (currenDate.isAfter(prevDate)) {
+                      final currentDateUtc = DateUtils.dateOnly(msg.timestamp.toUtc());
+                      final prevDateUtc = DateUtils.dateOnly(prevMsg.timestamp.toUtc());
+                      if (currentDateUtc.isAfter(prevDateUtc)) {
                         showDateHeader = true;
                       }
                     }
 
+                    final nowUtc = DateTime.now().toUtc();
+                    final localDate = msg.timestamp.toLocal();
+                    final currentDateUtc = DateUtils.dateOnly(localDate.toUtc());
+                    final todayUtc = DateUtils.dateOnly(nowUtc);
+                    final yesterdayUtc = DateUtils.dateOnly(nowUtc.subtract(const Duration(days: 1)));
+
                     String formattedDate;
-                    final now = DateTime.now();
-                    if (currenDate == DateUtils.dateOnly(now)) {
+                    if (currentDateUtc == todayUtc) {
                       formattedDate = "Hôm nay";
-                    } else if (currenDate == DateUtils.dateOnly(now.subtract(const Duration(days: 1)))) {
+                    } else if (currentDateUtc == yesterdayUtc) {
                       formattedDate = "Hôm qua";
                     } else {
-                      formattedDate = "${currenDate.day}/${currenDate.month}/${currenDate.year}";
+                      formattedDate = "${localDate.day}/${localDate.month}/${localDate.year}";
                     }
 
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        if(showDateHeader)
+                        if (showDateHeader)
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: Center(
@@ -157,10 +165,7 @@ class _PrivateChatScreenState extends ConsumerState<PrivateChatScreen> {
                                   color: Colors.grey[300],
                                   borderRadius: BorderRadius.circular(12),
                                 ),
-                                child: Text(
-                                  formattedDate,
-                                  style: const TextStyle(fontSize: 12, color: Colors.black54),
-                                ),
+                                child: Text(formattedDate, style: const TextStyle(fontSize: 12, color: Colors.black54)),
                               ),
                             ),
                           ),
@@ -211,7 +216,7 @@ class _PrivateChatScreenState extends ConsumerState<PrivateChatScreen> {
                                   Padding(
                                     padding: const EdgeInsets.only(top: 2),
                                     child: Text(
-                                      '${msg.timestamp.hour}:${msg.timestamp.minute.toString().padLeft(2, '0')}',
+                                      '${localTime.hour}:${localTime.minute.toString().padLeft(2, '0')}',
                                       style: const TextStyle(fontSize: 10, color: Colors.black54),
                                     ),
                                   ),

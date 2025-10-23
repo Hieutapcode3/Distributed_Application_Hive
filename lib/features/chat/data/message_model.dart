@@ -70,4 +70,27 @@ class MessageModel extends HiveObject {
       'readBy': readBy ?? [],
     };
   }
+
+  MessageModel copyWith({
+  String? id,
+  String? senderId,
+  String? receiverId,
+  bool? isGroup,
+  String? senderName,
+  DateTime? timestamp,
+  String? roomId,
+  String? content,
+}) {
+  return MessageModel(
+    id: id ?? this.id,
+    senderId: senderId ?? this.senderId,
+    receiverId: receiverId ?? this.receiverId,
+    isGroup: isGroup ?? this.isGroup,
+    senderName: senderName ?? this.senderName,
+    timestamp: timestamp ?? this.timestamp,
+    roomId: roomId ?? this.roomId,
+    content: content ?? this.content,
+  );
+}
+
 }
