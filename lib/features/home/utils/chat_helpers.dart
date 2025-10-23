@@ -3,7 +3,73 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:distributed_application_hive/features/chat/data/message_model.dart';
 
 class ChatHelpers {
-  // Helper function để format thời gian
+  // Helper function để format thời gian với AM/PM
+  static String formatTimeWithAMPM(DateTime timestamp) {
+    final hour = timestamp.hour;
+    final minute = timestamp.minute;
+    final period = hour >= 12 ? 'PM' : 'AM';
+    final displayHour = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
+
+    return '${displayHour}:${minute.toString().padLeft(2, '0')} $period';
+  }
+
+  // Helper function để format ngày
+  static String formatDate(DateTime timestamp) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = today.subtract(const Duration(days: 1));
+    final messageDate = DateTime(
+      timestamp.year,
+      timestamp.month,
+      timestamp.day,
+    );
+
+    if (messageDate == today) {
+      return 'Today';
+    } else if (messageDate == yesterday) {
+      return 'Yesterday';
+    } else {
+      // Format: "Dec 25, 2023" hoặc "25/12/2023"
+      final months = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
+      ];
+      return '${months[timestamp.month - 1]} ${timestamp.day}, ${timestamp.year}';
+    }
+  }
+
+  // Helper function để kiểm tra xem có cần hiển thị ngày không
+  static bool shouldShowDateHeader(
+    DateTime currentMessage,
+    DateTime? previousMessage,
+  ) {
+    if (previousMessage == null) return true;
+
+    final currentDate = DateTime(
+      currentMessage.year,
+      currentMessage.month,
+      currentMessage.day,
+    );
+    final previousDate = DateTime(
+      previousMessage.year,
+      previousMessage.month,
+      previousMessage.day,
+    );
+
+    return currentDate != previousDate;
+  }
+
+  // Helper function để format thời gian (giữ nguyên cho chat list)
   static String formatTimeAgo(DateTime timestamp) {
     final now = DateTime.now();
     final difference = now.difference(timestamp);

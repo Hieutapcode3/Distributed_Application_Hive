@@ -7,7 +7,9 @@ import 'package:distributed_application_hive/features/auth/data/user_model.dart'
 import 'package:distributed_application_hive/app/web_socket.dart';
 
 // 🔹 Provider cho WebSocketService
-final webSocketProvider = Provider<WebSocketService>((ref) => WebSocketService());
+final webSocketProvider = Provider<WebSocketService>(
+  (ref) => WebSocketService(),
+);
 
 class GlobalChatScreen extends ConsumerStatefulWidget {
   final UserModel currentUser;
@@ -22,10 +24,19 @@ class _GlobalChatScreenState extends ConsumerState<GlobalChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final uuid = const Uuid();
+  bool _hasText = false;
 
   @override
   void initState() {
     super.initState();
+
+    // Listen to text changes
+    _controller.addListener(() {
+      setState(() {
+        _hasText = _controller.text.trim().isNotEmpty;
+      });
+    });
+
     // Auto-scroll xuống dưới cùng khi màn hình được mở
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToBottom();
@@ -85,10 +96,14 @@ class _GlobalChatScreenState extends ConsumerState<GlobalChatScreen> {
             child: ValueListenableBuilder(
               valueListenable: messageBox.listenable(),
               builder: (context, Box<MessageModel> box, _) {
-                final messages = box.values.where((m) => m.roomId == "global").map((m) {
-                  final ts = m.timestamp.isUtc ? m.timestamp : m.timestamp.toUtc();
-                  return m.copyWith(timestamp: ts);
-                }).toList()..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+                final messages =
+                    box.values.where((m) => m.roomId == "global").map((m) {
+                        final ts = m.timestamp.isUtc
+                            ? m.timestamp
+                            : m.timestamp.toUtc();
+                        return m.copyWith(timestamp: ts);
+                      }).toList()
+                      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
                 print("Total messages in global chat: ${messages.length}");
 
@@ -99,13 +114,19 @@ class _GlobalChatScreenState extends ConsumerState<GlobalChatScreen> {
 
                 if (messages.isEmpty) {
                   return const Center(
-                    child: Text('💬 Chưa có tin nhắn nào', style: TextStyle(color: Colors.white70)),
+                    child: Text(
+                      '💬 Chưa có tin nhắn nào',
+                      style: TextStyle(color: Colors.white70),
+                    ),
                   );
                 }
 
                 return ListView.builder(
                   controller: _scrollController,
-                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 10,
+                    horizontal: 12,
+                  ),
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
                     final msg = messages[index];
@@ -117,8 +138,12 @@ class _GlobalChatScreenState extends ConsumerState<GlobalChatScreen> {
                       showDateHeader = true;
                     } else {
                       final prevMsg = messages[index - 1];
-                      final currentDateUtc = DateUtils.dateOnly(msg.timestamp.toUtc());
-                      final prevDateUtc = DateUtils.dateOnly(prevMsg.timestamp.toUtc());
+                      final currentDateUtc = DateUtils.dateOnly(
+                        msg.timestamp.toUtc(),
+                      );
+                      final prevDateUtc = DateUtils.dateOnly(
+                        prevMsg.timestamp.toUtc(),
+                      );
                       if (currentDateUtc.isAfter(prevDateUtc)) {
                         showDateHeader = true;
                       }
@@ -126,9 +151,13 @@ class _GlobalChatScreenState extends ConsumerState<GlobalChatScreen> {
 
                     final nowUtc = DateTime.now().toUtc();
                     final localDate = msg.timestamp.toLocal();
-                    final currentDateUtc = DateUtils.dateOnly(localDate.toUtc());
+                    final currentDateUtc = DateUtils.dateOnly(
+                      localDate.toUtc(),
+                    );
                     final todayUtc = DateUtils.dateOnly(nowUtc);
-                    final yesterdayUtc = DateUtils.dateOnly(nowUtc.subtract(const Duration(days: 1)));
+                    final yesterdayUtc = DateUtils.dateOnly(
+                      nowUtc.subtract(const Duration(days: 1)),
+                    );
 
                     String formattedDate;
                     if (currentDateUtc == todayUtc) {
@@ -136,7 +165,8 @@ class _GlobalChatScreenState extends ConsumerState<GlobalChatScreen> {
                     } else if (currentDateUtc == yesterdayUtc) {
                       formattedDate = "Hôm qua";
                     } else {
-                      formattedDate = "${localDate.day}/${localDate.month}/${localDate.year}";
+                      formattedDate =
+                          "${localDate.day}/${localDate.month}/${localDate.year}";
                     }
 
                     return Column(
@@ -147,18 +177,29 @@ class _GlobalChatScreenState extends ConsumerState<GlobalChatScreen> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: Center(
                               child: Container(
-                                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 4,
+                                  horizontal: 8,
+                                ),
                                 decoration: BoxDecoration(
                                   color: Colors.grey[300],
                                   borderRadius: BorderRadius.circular(12),
                                 ),
-                                child: Text(formattedDate, style: const TextStyle(color: Colors.black54, fontSize: 12)),
+                                child: Text(
+                                  formattedDate,
+                                  style: const TextStyle(
+                                    color: Colors.black54,
+                                    fontSize: 12,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
 
                         Align(
-                          alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                          alignment: isMe
+                              ? Alignment.centerRight
+                              : Alignment.centerLeft,
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -166,11 +207,18 @@ class _GlobalChatScreenState extends ConsumerState<GlobalChatScreen> {
                               if (!isMe)
                                 Padding(
                                   padding: const EdgeInsets.only(right: 8),
-                                  child: CircleAvatar(radius: 20, backgroundImage: AssetImage('assets/image/mtp.jpg')),
+                                  child: CircleAvatar(
+                                    radius: 20,
+                                    backgroundImage: AssetImage(
+                                      'assets/image/mtp.jpg',
+                                    ),
+                                  ),
                                 ),
 
                               Column(
-                                crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                                crossAxisAlignment: isMe
+                                    ? CrossAxisAlignment.end
+                                    : CrossAxisAlignment.start,
                                 children: [
                                   if (!isMe)
                                     Padding(
@@ -186,22 +234,43 @@ class _GlobalChatScreenState extends ConsumerState<GlobalChatScreen> {
                                     ),
 
                                   Container(
-                                    margin: const EdgeInsets.symmetric(vertical: 2),
+                                    margin: const EdgeInsets.symmetric(
+                                      vertical: 2,
+                                    ),
                                     padding: const EdgeInsets.all(10),
                                     decoration: BoxDecoration(
                                       color: isMe
-                                          ? const Color.fromRGBO(32, 160, 144, 1)
-                                          : const Color.fromRGBO(242, 247, 251, 1),
+                                          ? const Color.fromRGBO(
+                                              32,
+                                              160,
+                                              144,
+                                              1,
+                                            )
+                                          : const Color.fromRGBO(
+                                              242,
+                                              247,
+                                              251,
+                                              1,
+                                            ),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
-                                    child: Text(msg.content, style: const TextStyle(color: Colors.black, fontSize: 15)),
+                                    child: Text(
+                                      msg.content,
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 15,
+                                      ),
+                                    ),
                                   ),
 
                                   Padding(
                                     padding: const EdgeInsets.only(top: 2),
                                     child: Text(
                                       '${localTime.hour}:${localTime.minute.toString().padLeft(2, '0')}',
-                                      style: TextStyle(fontSize: 10, color: Colors.black54),
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color: Colors.black54,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -222,26 +291,103 @@ class _GlobalChatScreenState extends ConsumerState<GlobalChatScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             child: Row(
               children: [
+                // Attachment button
+                GestureDetector(
+                  onTap: () {
+                    // TODO: Implement attachment functionality
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    child: Image.asset(
+                      'assets/image/Clip.png',
+                      width: 24,
+                      height: 24,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                // Message input field
                 Expanded(
                   child: TextField(
                     controller: _controller,
-                    style: const TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.black),
                     decoration: InputDecoration(
-                      hintText: 'Nhập tin nhắn...',
-                      hintStyle: const TextStyle(color: Colors.white54),
+                      hintText: 'Write your message',
+                      hintStyle: const TextStyle(color: Colors.black54),
                       filled: true,
-                      fillColor: Colors.grey[850],
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      fillColor: Colors.grey[200],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
                     ),
                     onSubmitted: (_) => _sendMessage(),
                   ),
                 ),
                 const SizedBox(width: 8),
-                IconButton(
-                  icon: const Icon(Icons.send, color: Colors.blueAccent),
-                  onPressed: _sendMessage,
+                // Document button
+                GestureDetector(
+                  onTap: () {
+                    // TODO: Implement document functionality
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    child: Image.asset(
+                      'assets/image/files.png',
+                      width: 24,
+                      height: 24,
+                    ),
+                  ),
                 ),
+                const SizedBox(width: 8),
+                // Conditional buttons based on text input
+                if (!_hasText) ...[
+                  // Camera button
+                  GestureDetector(
+                    onTap: () {
+                      // TODO: Implement camera functionality
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      child: Image.asset(
+                        'assets/image/camera 01.png',
+                        width: 24,
+                        height: 24,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  // Microphone button
+                  GestureDetector(
+                    onTap: () {
+                      // TODO: Implement microphone functionality
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      child: Image.asset(
+                        'assets/image/microphone.png',
+                        width: 24,
+                        height: 24,
+                      ),
+                    ),
+                  ),
+                ] else ...[
+                  // Send button
+                  GestureDetector(
+                    onTap: _sendMessage,
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      child: Image.asset(
+                        'assets/image/Send.png',
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),

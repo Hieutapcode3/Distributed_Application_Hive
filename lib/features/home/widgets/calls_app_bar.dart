@@ -37,9 +37,7 @@ class CallsAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
         onPressed: () {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text('Search tapped!')));
+          // TODO: Implement search functionality
         },
       ),
       actions: [
@@ -60,9 +58,7 @@ class CallsAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
           ),
           onPressed: () {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text('Add call tapped!')));
+            // TODO: Implement add call functionality
           },
         ),
       ],

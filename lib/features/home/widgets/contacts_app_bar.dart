@@ -37,9 +37,7 @@ class ContactsAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
         onPressed: () {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text('Search tapped!')));
+          // TODO: Implement search functionality
         },
       ),
       actions: [
@@ -60,9 +58,7 @@ class ContactsAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
           ),
           onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Add contact tapped!')),
-            );
+            // TODO: Implement add contact functionality
           },
         ),
       ],
