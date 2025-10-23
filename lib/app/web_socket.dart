@@ -22,21 +22,19 @@ class WebSocketService {
         ? Hive.box<MessageModel>('messageBox')
         : await Hive.openBox<MessageModel>('messageBox');
 
-    channel = IOWebSocketChannel.connect('wss://chat-server-00oc.onrender.com');
+    channel = IOWebSocketChannel.connect('wss://chat-server-wlv5.onrender.com');
 
+    // Gửi connect
     channel!.sink.add(jsonEncode({'type': 'connect', 'user': currentUser.toJson()}));
 
     channel!.stream.listen((message) async {
       final data = jsonDecode(message);
+
       switch (data['type']) {
-        case 'init':
-          // Đồng bộ danh sách user
+        case 'init_users':
+          // Đồng bộ toàn bộ user từ Redis
           for (var u in data['users']) {
             userBox.put(u['uid'], UserModel.fromJson(u));
-          }
-          // Đồng bộ tin nhắn
-          for (var m in data['messages']) {
-            messageBox.put(m['id'], MessageModel.fromJson(m));
           }
           break;
 
@@ -45,51 +43,59 @@ class WebSocketService {
           break;
 
         case 'user_online':
-          final user = userBox.get(data['uid']);
-          if (user == null) {
-            print('User ${data['uid']} chưa có trong Hive khi nhận user_online');
-          } else {
+          final uid = data['uid'];
+          // Nếu là chính mình, update luôn local
+          final user = userBox.get(uid);
+          if (user != null) {
             final updatedUser = user.copyWith(isOnline: true);
-            await userBox.put(data['uid'], updatedUser);
+            await userBox.put(uid, updatedUser);
             print('${updatedUser.name} vừa online');
+          } else {
+            print('User $uid chưa có trong Hive khi nhận user_online');
           }
-
           break;
 
         case 'user_offline':
-          final user = userBox.get(data['uid']);
+          final uid = data['uid'];
+          final user = userBox.get(uid);
           if (user != null) {
             final updatedUser = user.copyWith(isOnline: false);
-            await userBox.put(data['uid'], updatedUser);
+            await userBox.put(uid, updatedUser);
             print('${updatedUser.name} vừa offline');
           }
           break;
 
         case 'message':
-          // Đồng bộ tin nhắn mới
           messageBox.put(data['message']['id'], MessageModel.fromJson(data['message']));
           break;
 
         case 'message_update':
-          // Cập nhật tin nhắn đã có
           messageBox.put(data['message']['id'], MessageModel.fromJson(data['message']));
           break;
 
         case 'message_delete':
-          // Xóa tin nhắn
           messageBox.delete(data['messageId']);
           break;
 
         case 'sync_messages':
-          // Đồng bộ nhiều tin nhắn cùng lúc
           for (var m in data['messages']) {
             messageBox.put(m['id'], MessageModel.fromJson(m));
           }
           break;
       }
     });
+
+    // Cập nhật trạng thái online của chính mình ngay
+    final localUser = userBox.get(currentUser.uid);
+    if (localUser != null) {
+      final updatedUser = localUser.copyWith(isOnline: true);
+      await userBox.put(currentUser.uid, updatedUser);
+    } else {
+      await userBox.put(currentUser.uid, currentUser.copyWith(isOnline: true));
+    }
   }
 
+  // Gửi tin nhắn
   void sendMessage(MessageModel message) {
     if (channel == null) return;
     channel!.sink.add(jsonEncode({'type': 'message', 'message': message.toJson()}));
@@ -112,6 +118,7 @@ class WebSocketService {
 
   void setUserOnline(String uid) {
     if (channel == null) return;
+    // Gửi trực tiếp cho server, server sẽ broadcast cho tất cả (bao gồm chính mình)
     channel!.sink.add(jsonEncode({'type': 'user_online', 'uid': uid}));
   }
 
